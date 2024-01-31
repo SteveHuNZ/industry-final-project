@@ -15,8 +15,8 @@ public class WelcomeFrame extends JFrame {
 
     public WelcomeFrame(){
         // set up JFrame;
-        setTitle("Welcome to management system");
-        setSize(400,300);
+        setTitle("---Welcome---");
+        setSize(700,450);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -29,7 +29,7 @@ public class WelcomeFrame extends JFrame {
         initializeOptionsPanel();
 
         // Add panel to main panel;
-        mainPanel.add(fileChooserPanel, "File chooser");
+        mainPanel.add(fileChooserPanel, "File Chooser");
         mainPanel.add(optionsPanel, "Options");
 
         // add main panel to Frame;
@@ -46,13 +46,18 @@ public class WelcomeFrame extends JFrame {
 
         JButton openButton = new JButton("Open/Create Filestore");
         openButton.addActionListener(new ActionListener() {
+            // actionListener is an interface, to implement it, you must override the method "actionPerformed".
             @Override
             public void actionPerformed(ActionEvent e) {
+
                 int returnVal = fileChooser.showOpenDialog(WelcomeFrame.this);
                 if(returnVal == JFileChooser.APPROVE_OPTION){
+                    // APPROVE_OPTION and returnVal are both integers, and they are final constants which is decided by method "showOpenDialog" and component "JFileChooser".
                     File file = fileChooser.getSelectedFile();
 
                     cardLayout.show(mainPanel, "Options");
+                    // cardLayout is just like a bunch of cards which you can check only one of them at the same time.
+
                 }
             }
         });
