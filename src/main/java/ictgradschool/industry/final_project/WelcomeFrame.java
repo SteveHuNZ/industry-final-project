@@ -1,6 +1,7 @@
 package ictgradschool.industry.final_project;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -40,7 +41,11 @@ public class WelcomeFrame extends JFrame {
     }
 
     private void initializeFileChooserPanel(){
-        fileChooserPanel = new JPanel();
+        fileChooserPanel = new JPanel(new BorderLayout());
+        JLabel welcomeLabel = new JLabel("<html><h1>Welcome to Inventory Manager</h1><p>Select a file to begin.</p></html>", JLabel.CENTER);
+        fileChooserPanel.add(welcomeLabel, BorderLayout.NORTH);
+
+
         fileChooser = new JFileChooser();
         fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 
@@ -61,8 +66,10 @@ public class WelcomeFrame extends JFrame {
                 }
             }
         });
-        fileChooserPanel.add(fileChooser);
-        fileChooserPanel.add(openButton);
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(openButton);
+        fileChooserPanel.add(buttonPanel, BorderLayout.SOUTH);
+        fileChooserPanel.add(fileChooser, BorderLayout.CENTER);
     }
     private void initializeOptionsPanel(){
         optionsPanel = new JPanel();
@@ -71,6 +78,15 @@ public class WelcomeFrame extends JFrame {
         JButton closeFilestoreButton = new JButton("Close Filestore");
         JButton openInventoryManagerButton = new JButton("Open Inventory Manager");
         JButton openPointOfSaleButton = new JButton("Open Point of Sale");
+
+        openInventoryManagerButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                InventoryManagerFrame inventoryManagerFrame = new InventoryManagerFrame();
+                inventoryManagerFrame.setVisible(true);
+                WelcomeFrame.this.setVisible(false);
+            }
+        });
 
         closeFilestoreButton.addActionListener(e -> cardLayout.show(mainPanel, "File Chooser"));
 
