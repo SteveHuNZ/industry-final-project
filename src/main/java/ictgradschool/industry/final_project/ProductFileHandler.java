@@ -28,7 +28,7 @@ public class ProductFileHandler {
         return new Product(identifier, name, description, price, stockQuantity);
     }
     // write to file
-    private void writeProductsToFile(String filePath, List<Product> products) {
+    public void writeProductsToFile(String filePath, List<Product> products) {
         try(BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))){
             for(Product p : products) {
                 writer.write(productToFileLine(p));
