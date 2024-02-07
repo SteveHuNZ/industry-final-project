@@ -54,4 +54,9 @@ public class Product {
     public void setStockQuantity(int stockQuantity) {
         this.stockQuantity = stockQuantity;
     }
+    @Override
+    public String toString(){
+        return name + " - $" + price + ". Description: " + description;
+    }
+
 }

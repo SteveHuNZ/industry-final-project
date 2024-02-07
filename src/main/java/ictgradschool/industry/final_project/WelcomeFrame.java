@@ -13,6 +13,7 @@ public class WelcomeFrame extends JFrame {
     private JPanel fileChooserPanel;
     private JPanel optionsPanel;
     private JFileChooser fileChooser;
+    String filePath;
 
     public WelcomeFrame(){
         // set up JFrame;
@@ -59,6 +60,7 @@ public class WelcomeFrame extends JFrame {
                 if(returnVal == JFileChooser.APPROVE_OPTION){
                     // APPROVE_OPTION and returnVal are both integers, and they are final constants which is decided by method "showOpenDialog" and component "JFileChooser".
                     File file = fileChooser.getSelectedFile();
+                    filePath = file.getAbsolutePath();
 
                     cardLayout.show(mainPanel, "Options");
                     // cardLayout is just like a bunch of cards which you can check only one of them at the same time.
@@ -82,12 +84,22 @@ public class WelcomeFrame extends JFrame {
         openInventoryManagerButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                InventoryManagerFrame inventoryManagerFrame = new InventoryManagerFrame();
+                InventoryManagerFrame inventoryManagerFrame = new InventoryManagerFrame(filePath);
                 inventoryManagerFrame.setVisible(true);
                 WelcomeFrame.this.setVisible(false);
             }
         });
 
+        openPointOfSaleButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ProductFileHandler fileHandler = new ProductFileHandler();
+                java.util.List<Product> inventory =fileHandler.loadProductFromFile(filePath);
+                PointOfSaleFrame pointOfSaleFrame = new PointOfSaleFrame(inventory);
+                pointOfSaleFrame.setVisible(true);
+                WelcomeFrame.this.setVisible(false);
+            }
+        });
         closeFilestoreButton.addActionListener(e -> cardLayout.show(mainPanel, "File Chooser"));
 
         optionsPanel.add(closeFilestoreButton);
