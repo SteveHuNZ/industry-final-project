@@ -56,7 +56,7 @@ public class Product {
     }
     @Override
     public String toString(){
-        return name + " - $" + price + ". Description: " + description;
+        return String.format("Name: %-30s Price: %-10.2f Stock Quantity: %d", name, price, stockQuantity);
     }
 
 }

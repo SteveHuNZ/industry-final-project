@@ -76,8 +76,29 @@ public class InventoryManagerFrame extends JFrame {
         String identifier = identifierField.getText();
         String name = nameField.getText();
         String description = descriptionField.getText();
-        double price = Double.parseDouble(priceField.getText());
-        int stockQuantity = Integer.parseInt(stockQuantityField.getText());
+        String priceText = priceField.getText();
+        String stockQuantityText = stockQuantityField.getText();
+
+        // check validation of input
+        String identifierLetterPattern = "[A-Z]{10}$";
+        String identifierNumericPattern = "[0-9]{10}";
+
+        if(!(identifier.matches(identifierLetterPattern) && identifier.matches(identifierNumericPattern))){
+            JOptionPane.showMessageDialog(this, "Identifier must be 10 characters long and consists of uppercase letters and numbers.", "Invalid Identifier", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // check price and stockQuantity type.
+        double price;
+        int stockQuantity;
+        try{
+            price = Double.parseDouble(priceText);
+            stockQuantity = Integer.parseInt(stockQuantityText);
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Price must be a number and stock quantity must be an integer.", "Invalid price or stock quantity input.", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
 
         tableModel.addRow(new Object[]{identifier, name, description, price, stockQuantity});
         saveProductsToFile();

@@ -101,7 +101,7 @@ public class WelcomeFrame extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 ProductFileHandler fileHandler = new ProductFileHandler();
                 java.util.List<Product> inventory =fileHandler.loadProductFromFile(filePath);
-                PointOfSaleFrame pointOfSaleFrame = new PointOfSaleFrame(inventory);
+                PointOfSaleFrame pointOfSaleFrame = new PointOfSaleFrame(inventory, WelcomeFrame.this);
                 pointOfSaleFrame.setVisible(true);
                 WelcomeFrame.this.setVisible(false);
             }

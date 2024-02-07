@@ -13,13 +13,15 @@ public class PointOfSaleFrame extends JFrame {
     private JList<String> cartList;
     private DefaultListModel<String> cartModel;
     private Map<Product, Integer> cartContents;
-    private JButton addToCartButton, removeFromCartButton, checkoutButton;
+    private JButton addToCartButton, removeFromCartButton, checkoutButton, goBackButton;
     private JLabel totalCostLabel;
     private double totalCost = 0.0;
-    public PointOfSaleFrame(List<Product> inventory){
+    private WelcomeFrame welcomeFrame;
+    public PointOfSaleFrame(List<Product> inventory, WelcomeFrame welcomeFrame){
         setTitle("Point of Sale");
-        setSize(800, 600);
+        setSize(1100, 700);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        this.welcomeFrame = welcomeFrame;
         initializeComponents();
         loadInventory(inventory);
     }
@@ -31,13 +33,26 @@ public class PointOfSaleFrame extends JFrame {
         cartList = new JList<>(cartModel);
         cartContents = new HashMap<>();
 
+        inventoryList.setCellRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+
+                setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
+
+                return c;
+            }
+        });
+
         addToCartButton = new JButton("Add to cart");
         removeFromCartButton = new JButton("Remove from cart");
         checkoutButton = new JButton("Checkout");
+        goBackButton = new JButton("Go Back");
 
         addToCartButton.addActionListener(e -> addToCart());
         removeFromCartButton.addActionListener(e -> removeFromCart());
         checkoutButton.addActionListener(e -> checkout());
+        goBackButton.addActionListener( e -> goBack());
 
 
         totalCostLabel = new JLabel("Total Cost: $0.00");
@@ -47,6 +62,7 @@ public class PointOfSaleFrame extends JFrame {
         buttonsPanel.add(addToCartButton);
         buttonsPanel.add(removeFromCartButton);
         buttonsPanel.add(checkoutButton);
+        buttonsPanel.add(goBackButton);
 
         mainPanel.add(new JScrollPane(inventoryList), BorderLayout.WEST);
         mainPanel.add(new JScrollPane(cartList), BorderLayout.CENTER);
@@ -56,6 +72,10 @@ public class PointOfSaleFrame extends JFrame {
         // add mainPanel into Frame
         this.add(mainPanel);
         this.setVisible(true);
+    }
+    private void goBack(){
+        this.setVisible(false);
+        welcomeFrame.setVisible(true);
     }
     private void updateCartDisplay() {
         cartModel.clear();
@@ -77,6 +97,7 @@ public class PointOfSaleFrame extends JFrame {
         }
         return null;
     }
+
 
     private void loadInventory(List<Product> inventory){
         for(Product product : inventory){
@@ -139,6 +160,7 @@ public class PointOfSaleFrame extends JFrame {
             int currentQty = cartContents.get(productToRemove);
             if (currentQty > 1) {
                 cartContents.put(productToRemove, currentQty - 1);
+                // TODO
             } else {
                 cartContents.remove(productToRemove);
             }
