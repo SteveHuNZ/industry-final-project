@@ -89,6 +89,7 @@ public class InventoryManagerFrame extends JFrame {
             saveProductsToFile();
         } else {
             //  TODO: Maybe show message to user.
+            JOptionPane.showMessageDialog(this, "Please select product to remove from the cart.", "No product selected.", JOptionPane.WARNING_MESSAGE);
         }
     }
     private void saveProductsToFile() {

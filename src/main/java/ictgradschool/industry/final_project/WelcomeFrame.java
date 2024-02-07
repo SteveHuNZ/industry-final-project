@@ -18,7 +18,7 @@ public class WelcomeFrame extends JFrame {
     public WelcomeFrame(){
         // set up JFrame;
         setTitle("---Welcome---");
-        setSize(700,450);
+        setSize(1200,750);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -43,9 +43,16 @@ public class WelcomeFrame extends JFrame {
 
     private void initializeFileChooserPanel(){
         fileChooserPanel = new JPanel(new BorderLayout());
-        JLabel welcomeLabel = new JLabel("<html><h1>Welcome to Inventory Manager</h1><p>Select a file to begin.</p></html>", JLabel.CENTER);
+        JLabel welcomeLabel = new JLabel("<html><h1>Welcome to WareMarket Manager System</h1><p>Select a file to begin.</p></html>", JLabel.CENTER);
         fileChooserPanel.add(welcomeLabel, BorderLayout.NORTH);
 
+        // create a JLabel to show image;
+        JLabel imageLabel = new JLabel();
+        imageLabel.setHorizontalAlignment(JLabel.CENTER);
+
+        ImageIcon icon = new ImageIcon(getClass().getResource("/WareMarket.png"));
+        imageLabel.setIcon(icon);
+        fileChooserPanel.add(imageLabel, BorderLayout.CENTER);
 
         fileChooser = new JFileChooser();
         fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
@@ -71,7 +78,6 @@ public class WelcomeFrame extends JFrame {
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(openButton);
         fileChooserPanel.add(buttonPanel, BorderLayout.SOUTH);
-        fileChooserPanel.add(fileChooser, BorderLayout.CENTER);
     }
     private void initializeOptionsPanel(){
         optionsPanel = new JPanel();
