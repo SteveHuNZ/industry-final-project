@@ -11,7 +11,8 @@ public class InventoryManagerFrame extends JFrame {
     private DefaultTableModel tableModel;
     private String filePath;
     private JTextField identifierField, nameField, descriptionField, priceField, stockQuantityField;
-    private JButton addButton, removeButton;
+    private JButton addButton, removeButton, goBackButton;
+    private WelcomeFrame welcomeFrame;
     public InventoryManagerFrame() {
         setTitle("Inventory Manager");
         setSize(800, 600);
@@ -19,8 +20,9 @@ public class InventoryManagerFrame extends JFrame {
         initializeComponents();
         initializeTable();
     }
-    public InventoryManagerFrame(String filePath){
+    public InventoryManagerFrame(String filePath, WelcomeFrame welcomeFrame){
         this();
+        this.welcomeFrame = welcomeFrame;
         this.filePath = filePath;
         loadProducts();
     }
@@ -42,6 +44,7 @@ public class InventoryManagerFrame extends JFrame {
         add(mainPanel);
         JPanel inputPanel = new JPanel(new GridLayout(0, 2));
 
+        //textFields below
         inputPanel.add(new JLabel("Identifier: "));
         identifierField = new JTextField();
         inputPanel.add(identifierField);
@@ -66,11 +69,19 @@ public class InventoryManagerFrame extends JFrame {
         addButton.addActionListener(e -> addNewProduct());
         removeButton = new JButton("Remove Selected Product");
         removeButton.addActionListener( e -> removeSelectedProduct());
+        goBackButton = new JButton("Go Back");
+        goBackButton.addActionListener( e -> goBack());
+
         inputPanel.add(addButton);
         inputPanel.add(removeButton);
+        inputPanel.add(goBackButton);
 
         mainPanel.add(inputPanel, BorderLayout.SOUTH);
 
+    }
+    private void goBack(){
+        this.setVisible(false);
+        welcomeFrame.setVisible(true);
     }
     private void addNewProduct(){
         String identifier = identifierField.getText();
@@ -80,12 +91,14 @@ public class InventoryManagerFrame extends JFrame {
         String stockQuantityText = stockQuantityField.getText();
 
         // check validation of input
-        String identifierLetterPattern = "[A-Z]{10}$";
-        String identifierNumericPattern = "[0-9]{10}";
+        String identifierPattern = "(?=.*[A-Z])(?=.*[0-9])[A-Z0-9]{10}$";
 
-        if(!(identifier.matches(identifierLetterPattern) && identifier.matches(identifierNumericPattern))){
+
+        if(!(identifier.matches(identifierPattern))) {
             JOptionPane.showMessageDialog(this, "Identifier must be 10 characters long and consists of uppercase letters and numbers.", "Invalid Identifier", JOptionPane.ERROR_MESSAGE);
             return;
+        } else {
+            JOptionPane.showMessageDialog(this, identifier + ": " +  name + " added successfully!", "Product added successfully!", JOptionPane.INFORMATION_MESSAGE);
         }
 
         // check price and stockQuantity type.
@@ -109,7 +122,6 @@ public class InventoryManagerFrame extends JFrame {
             tableModel.removeRow(selectedRow);
             saveProductsToFile();
         } else {
-            //  TODO: Maybe show message to user.
             JOptionPane.showMessageDialog(this, "Please select product to remove from the cart.", "No product selected.", JOptionPane.WARNING_MESSAGE);
         }
     }
@@ -119,7 +131,7 @@ public class InventoryManagerFrame extends JFrame {
             products.add(new Product(
                     (String) tableModel.getValueAt(i, 0), // Identifier
                     (String) tableModel.getValueAt(i, 1), // Name
-                    (String) tableModel.getValueAt(i, 2), // Name
+                    (String) tableModel.getValueAt(i, 2), // Description
                     (double) tableModel.getValueAt(i, 3), // Name
                     (int) tableModel.getValueAt(i, 4)// Name
             ));
@@ -127,6 +139,8 @@ public class InventoryManagerFrame extends JFrame {
         ProductFileHandler fileHandler = new ProductFileHandler();
         fileHandler.writeProductsToFile(filePath, products);
     }
+
+
     private java.util.List<Product> getAllProductsFromTable() {
         java.util.List<Product> products = new ArrayList<>();
         for (int i = 0; i < tableModel.getRowCount(); i++) {
@@ -147,6 +161,7 @@ public class InventoryManagerFrame extends JFrame {
         tableModel = new DefaultTableModel(columnNames, 0);
         productTable = new JTable(tableModel);
         tableModel.addTableModelListener(e -> {
+            // automatically save whenever there are changes. No save button or hotKey needed.
             saveProductsToFile();
         });
         productTable = new JTable(tableModel);
