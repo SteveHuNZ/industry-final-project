@@ -15,7 +15,7 @@ public class ProductFileHandler {
                 products.add(product);
             }
         }catch(IOException e){
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Failed to read date from file.", "Error", JOptionPane.ERROR_MESSAGE);
         }
         return products;
     }
@@ -59,7 +59,7 @@ public class ProductFileHandler {
                 writer.newLine();
             }
         } catch (IOException e){
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Failed to write date to file.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
     private String productToFileLine(Product product){
@@ -82,7 +82,6 @@ public class ProductFileHandler {
                 }
             }
         } catch (IOException e){
-            e.printStackTrace();
             JOptionPane.showMessageDialog(null, "Failed to load product from file.", "Error", JOptionPane.ERROR_MESSAGE);
         }
         return products;

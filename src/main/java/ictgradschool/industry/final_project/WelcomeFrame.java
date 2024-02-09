@@ -1,7 +1,6 @@
 package ictgradschool.industry.final_project;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,7 +16,7 @@ public class WelcomeFrame extends JFrame {
 
     public WelcomeFrame(){
         // set up JFrame;
-        setTitle("---Welcome---");
+        setTitle("---Welcome to WareMarket Manager System---");
         setSize(1200,750);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -43,7 +42,7 @@ public class WelcomeFrame extends JFrame {
 
     private void initializeFileChooserPanel(){
         fileChooserPanel = new JPanel(new BorderLayout());
-        JLabel welcomeLabel = new JLabel("<html><h1>Welcome to WareMarket Manager System</h1><p>Select a file to begin.</p></html>", JLabel.CENTER);
+        JLabel welcomeLabel = new JLabel("<html><h1>Select a file to begin.</h1></html>", JLabel.CENTER);
         fileChooserPanel.add(welcomeLabel, BorderLayout.NORTH);
 
         // create a JLabel to show image;
@@ -90,7 +89,7 @@ public class WelcomeFrame extends JFrame {
         openInventoryManagerButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                InventoryManagerFrame inventoryManagerFrame = new InventoryManagerFrame(filePath);
+                InventoryManagerFrame inventoryManagerFrame = new InventoryManagerFrame(filePath, WelcomeFrame.this);
                 inventoryManagerFrame.setVisible(true);
                 WelcomeFrame.this.setVisible(false);
             }
