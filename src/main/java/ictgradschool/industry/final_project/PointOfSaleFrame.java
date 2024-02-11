@@ -2,6 +2,8 @@ package ictgradschool.industry.final_project;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
@@ -17,7 +19,8 @@ public class PointOfSaleFrame extends JFrame {
     private JLabel totalCostLabel;
     private double totalCost = 0.0;
     private WelcomeFrame welcomeFrame;
-    public PointOfSaleFrame(List<Product> inventory, WelcomeFrame welcomeFrame){
+
+    public PointOfSaleFrame(List<Product> inventory, WelcomeFrame welcomeFrame) {
         setTitle("Point of Sale");
         setSize(1100, 700);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -25,14 +28,15 @@ public class PointOfSaleFrame extends JFrame {
         initializeComponents();
         loadInventory(inventory);
     }
-    private void initializeComponents(){
+
+    private void initializeComponents() {
         mainPanel = new JPanel(new BorderLayout());
         inventoryModel = new DefaultListModel<>();
         inventoryList = new JList<>(inventoryModel);
         cartModel = new DefaultListModel<>();
         cartList = new JList<>(cartModel);
         cartContents = new HashMap<>();
-
+        // set grey split line but cannot vertically alignment.
         inventoryList.setCellRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -43,7 +47,6 @@ public class PointOfSaleFrame extends JFrame {
                 return c;
             }
         });
-
         addToCartButton = new JButton("Add to cart");
         removeFromCartButton = new JButton("Remove from cart");
         checkoutButton = new JButton("Checkout");
@@ -52,7 +55,7 @@ public class PointOfSaleFrame extends JFrame {
         addToCartButton.addActionListener(e -> addToCart());
         removeFromCartButton.addActionListener(e -> removeFromCart());
         checkoutButton.addActionListener(e -> checkout());
-        goBackButton.addActionListener( e -> goBack());
+        goBackButton.addActionListener(e -> goBack());
 
 
         totalCostLabel = new JLabel("Total Cost: $0.00");
@@ -73,10 +76,12 @@ public class PointOfSaleFrame extends JFrame {
         this.add(mainPanel);
         this.setVisible(true);
     }
-    private void goBack(){
+
+    private void goBack() {
         this.setVisible(false);
         welcomeFrame.setVisible(true);
     }
+
     private void updateCartDisplay() {
         cartModel.clear();
         totalCost = 0.0;
@@ -88,6 +93,7 @@ public class PointOfSaleFrame extends JFrame {
         });
         totalCostLabel.setText("Total Cost: $" + String.format("%.2f", totalCost));
     }
+
     private Product findProductByName(String name) {
         for (int i = 0; i < inventoryModel.getSize(); i++) {
             Product product = inventoryModel.getElementAt(i);
@@ -99,28 +105,29 @@ public class PointOfSaleFrame extends JFrame {
     }
 
 
-    private void loadInventory(List<Product> inventory){
-        for(Product product : inventory){
-            if(product.getStockQuantity() > 0){
+    private void loadInventory(List<Product> inventory) {
+        for (Product product : inventory) {
+            if (product.getStockQuantity() > 0) {
                 inventoryModel.addElement(product);
             }
         }
     }
-    private void addToCart(){
+
+    private void addToCart() {
         // get select product
         Product selectedProduct = inventoryList.getSelectedValue();
-        if(selectedProduct == null){
+        if (selectedProduct == null) {
             JOptionPane.showMessageDialog(this, "Please select a product to add to the cart.", "No product selected", JOptionPane.WARNING_MESSAGE);
             return;
         }
         // check stock
-        if(selectedProduct.getStockQuantity() <= 0){
+        if (selectedProduct.getStockQuantity() <= 0) {
             JOptionPane.showMessageDialog(this, "This product is out of stock.", "Out of Stock", JOptionPane.WARNING_MESSAGE);
             return;
         }
         // reduce stock quantity and renew stock list
         selectedProduct.setStockQuantity(selectedProduct.getStockQuantity() - 1);
-        if(selectedProduct.getStockQuantity() == 0){
+        if (selectedProduct.getStockQuantity() == 0) {
             inventoryModel.removeElement(selectedProduct);
         } else {
             inventoryList.repaint();
@@ -131,6 +138,7 @@ public class PointOfSaleFrame extends JFrame {
         updateCartDisplay();
         updateTotalCost();
     }
+
     private void updateTotalCost() {
         totalCost = 0.0;
         cartContents.forEach((product, quantity) -> {
@@ -138,11 +146,12 @@ public class PointOfSaleFrame extends JFrame {
         });
         totalCostLabel.setText(String.format("Total: $%.2f", totalCost));
     }
-    private void removeFromCart(){
+
+    private void removeFromCart() {
         // if user has selected an entry in cartList
         int selectedIndex = cartList.getSelectedIndex();
-        if(selectedIndex == -1){
-            JOptionPane.showMessageDialog(this,"Please select a product to remove from the cart.", "No product selected", JOptionPane.WARNING_MESSAGE);
+        if (selectedIndex == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a product to remove from the cart.", "No product selected", JOptionPane.WARNING_MESSAGE);
             return;
         }
         String selectedItem = cartModel.get(selectedIndex);
@@ -160,7 +169,6 @@ public class PointOfSaleFrame extends JFrame {
             int currentQty = cartContents.get(productToRemove);
             if (currentQty > 1) {
                 cartContents.put(productToRemove, currentQty - 1);
-                // TODO
             } else {
                 cartContents.remove(productToRemove);
             }
@@ -170,14 +178,14 @@ public class PointOfSaleFrame extends JFrame {
             JOptionPane.showMessageDialog(this, "Error finding product in cart", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-    private void checkout(){
-        if(cartContents.isEmpty()) {
+
+    private void checkout() {
+        if (cartContents.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Your cart is empty.", "Checkout", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
         // renew stock quantity;
-        cartContents.forEach((product, quantity) ->{
-            // TODO: if stock will renew automatically when something is added to cart. No operation needed here.
+        cartContents.forEach((product, quantity) -> {
         });
 
         // generate receipt here
@@ -190,9 +198,40 @@ public class PointOfSaleFrame extends JFrame {
 
         JOptionPane.showMessageDialog(this, "Checkout completed.", "Checkout", JOptionPane.INFORMATION_MESSAGE);
     }
-    private void generateReceipt(){
-        //TODO: may use file chooser to store the receipt;
-    }
 
+    private void generateReceipt() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Save Receipt");
+        int userSelection = fileChooser.showSaveDialog(this);
+
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            File receiptFile = fileChooser.getSelectedFile();
+
+            List<String> receiptLines = new ArrayList<>();
+            receiptLines.add("--------------------------------");
+            double totalCost = 0.0;
+
+            for (Map.Entry<Product, Integer> entry : cartContents.entrySet()) {
+                Product product = entry.getKey();
+                Integer quantity = entry.getValue();
+                double cost = product.getPrice() * quantity;
+                totalCost += cost;
+
+                String unitCost = quantity > 1 ? String.format("($%.2f)", product.getPrice()) : "";
+                receiptLines.add(String.format("%d  %s %s    $%.2f", quantity, product.getName(), unitCost, cost));
+            }
+
+            receiptLines.add("================================");
+            receiptLines.add(String.format("   TOTAL                 $%.2f", totalCost));
+            receiptLines.add("--------------------------------");
+
+            ProductFileHandler fileHandler = new ProductFileHandler();
+            fileHandler.writeFile(receiptFile.getAbsolutePath(), receiptLines);
+
+            JOptionPane.showMessageDialog(this, "Receipt has been saved successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, "Checkout canceled.", "Canceled", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
 
 }

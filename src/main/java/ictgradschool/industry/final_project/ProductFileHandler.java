@@ -66,6 +66,16 @@ public class ProductFileHandler {
         return product.getIdentifier() + "," + product.getName() + "," + product.getDescription()
                 + "," + product.getPrice() + "," + product.getStockQuantity() + ",";
     }
+    public void writeFile(String filePath, List<String> lines) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+            for (String line : lines) {
+                writer.write(line);
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Failed to write to file.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
     public List<Product> loadProductFromFile(String filePath){
         List<Product> products = new ArrayList<>();
         try(BufferedReader br = new BufferedReader(new FileReader(filePath))){
