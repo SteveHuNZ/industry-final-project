@@ -4,6 +4,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import javax.swing.table.TableRowSorter;
 
 public class InventoryManagerFrame extends JFrame {
     private JPanel mainPanel;
@@ -13,6 +14,9 @@ public class InventoryManagerFrame extends JFrame {
     private JTextField identifierField, nameField, descriptionField, priceField, stockQuantityField;
     private JButton addButton, removeButton, goBackButton;
     private WelcomeFrame welcomeFrame;
+    private JComboBox<String> filterComboBox;
+    private JTextField searchField;
+    private JButton searchButton;
     public InventoryManagerFrame() {
         setTitle("Inventory Manager");
         setSize(800, 600);
@@ -39,11 +43,38 @@ public class InventoryManagerFrame extends JFrame {
             });
         }
     }
-    private void initializeComponents(){
+    private void initializeComponents() {
         mainPanel = new JPanel(new BorderLayout());
         add(mainPanel);
-        JPanel inputPanel = new JPanel(new GridLayout(0, 2));
 
+        // Panel for Add, Remove, and Go Back buttons
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 5));
+        addButton = new JButton("Add");
+        removeButton = new JButton("Remove");
+        goBackButton = new JButton("Go Back");
+
+        buttonPanel.add(addButton);
+        buttonPanel.add(removeButton);
+        buttonPanel.add(goBackButton);
+
+        addButton.addActionListener(e -> addNewProduct());
+        removeButton.addActionListener(e -> removeSelectedProduct());
+        goBackButton.addActionListener(e -> goBack());
+
+        // Panel for Search components
+        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 5));
+        JLabel searchLabel = new JLabel("Search:");
+        JTextField searchField = new JTextField(20);
+        JButton searchButton = new JButton("Search");
+
+        searchPanel.add(searchLabel);
+        searchPanel.add(searchField);
+        searchPanel.add(searchButton);
+
+        searchButton.addActionListener(e -> applySearchFilter(searchField.getText()));
+
+        // Panel for inputs and labels
+        JPanel inputPanel = new JPanel(new GridLayout(0, 2, 5, 5));
         //textFields below
         inputPanel.add(new JLabel("Identifier: "));
         identifierField = new JTextField();
@@ -65,19 +96,34 @@ public class InventoryManagerFrame extends JFrame {
         stockQuantityField = new JTextField();
         inputPanel.add(stockQuantityField);
 
-        addButton = new JButton("Add Product");
-        addButton.addActionListener(e -> addNewProduct());
-        removeButton = new JButton("Remove Selected Product");
-        removeButton.addActionListener( e -> removeSelectedProduct());
-        goBackButton = new JButton("Go Back");
-        goBackButton.addActionListener( e -> goBack());
+        // Adding button panel and search panel to the main panel
+        JPanel southPanel = new JPanel(new BorderLayout());
+        southPanel.add(buttonPanel, BorderLayout.NORTH);
+        southPanel.add(searchPanel, BorderLayout.CENTER);
+        southPanel.add(inputPanel, BorderLayout.SOUTH);
+        mainPanel.add(southPanel, BorderLayout.SOUTH);
+    }
 
-        inputPanel.add(addButton);
-        inputPanel.add(removeButton);
-        inputPanel.add(goBackButton);
+    public void applySearchFilter(String searchText) {
+        RowFilter<DefaultTableModel, Object> rf = RowFilter.regexFilter("(?i)" + searchText);
+        // (?!) makes the search case-insensitive(Do not demanding on Uppercase or Lowercase).
+        ((TableRowSorter<DefaultTableModel>) productTable.getRowSorter()).setRowFilter(rf);
+    }
 
-        mainPanel.add(inputPanel, BorderLayout.SOUTH);
+    // Method to clear search filter and show all items
+    public void clearSearch() {
+        applySearchFilter("");
+    }
 
+    // Method to apply stock quantity filter
+    public void applyStockFilter(String filterType) {
+        RowFilter<DefaultTableModel, Integer> rf = null;
+        if (filterType.equals("In-Stock")) {
+            rf = RowFilter.numberFilter(RowFilter.ComparisonType.AFTER, 0, 4); // Assuming stock quantity is in column 4
+        } else if (filterType.equals("Out-of-Stock")) {
+            rf = RowFilter.numberFilter(RowFilter.ComparisonType.EQUAL, 0, 4);
+        }
+        ((TableRowSorter<DefaultTableModel>) productTable.getRowSorter()).setRowFilter(rf);
     }
     private void goBack(){
         this.setVisible(false);
@@ -158,15 +204,25 @@ public class InventoryManagerFrame extends JFrame {
     }
     private void initializeTable(){
         String[] columnNames = {"Identifier", "Name", "Description", "Price", "Stock Quantity"};
-        tableModel = new DefaultTableModel(columnNames, 0);
-        productTable = new JTable(tableModel);
-        tableModel.addTableModelListener(e -> {
-            // automatically save whenever there are changes. No save button or hotKey needed.
-            saveProductsToFile();
-        });
+        tableModel = new DefaultTableModel(columnNames, 0) {
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                switch (columnIndex) {
+                    case 3: // price column
+                        return Double.class;
+                    case 4: // stock quantity column
+                        return Integer.class;
+                    default:
+                        return String.class;
+                }
+            }
+        };
         productTable = new JTable(tableModel);
         JScrollPane scrollPane = new JScrollPane(productTable);
         mainPanel.add(scrollPane, BorderLayout.CENTER);
+        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(tableModel);
+        productTable.setRowSorter(sorter);
     }
+
 
 }
