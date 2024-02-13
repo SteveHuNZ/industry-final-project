@@ -93,18 +93,6 @@ public class PointOfSaleFrame extends JFrame {
         });
         totalCostLabel.setText("Total Cost: $" + String.format("%.2f", totalCost));
     }
-
-    private Product findProductByName(String name) {
-        for (int i = 0; i < inventoryModel.getSize(); i++) {
-            Product product = inventoryModel.getElementAt(i);
-            if (product.getName().equals(name)) {
-                return product;
-            }
-        }
-        return null;
-    }
-
-
     private void loadInventory(List<Product> inventory) {
         for (Product product : inventory) {
             if (product.getStockQuantity() > 0) {
@@ -154,6 +142,7 @@ public class PointOfSaleFrame extends JFrame {
             JOptionPane.showMessageDialog(this, "Please select a product to remove from the cart.", "No product selected", JOptionPane.WARNING_MESSAGE);
             return;
         }
+
         String selectedItem = cartModel.get(selectedIndex);
         String productName = selectedItem.split(" x")[0];
         Product productToRemove = null;
@@ -172,9 +161,17 @@ public class PointOfSaleFrame extends JFrame {
             } else {
                 cartContents.remove(productToRemove);
             }
+            productToRemove.setStockQuantity(productToRemove.getStockQuantity() + 1);
+
+            if (!inventoryModel.contains(productToRemove)) {
+                inventoryModel.addElement(productToRemove);
+            } else {
+                inventoryList.repaint();
+            }
             updateCartDisplay();
             updateTotalCost();
-        } else {
+        }
+        else {
             JOptionPane.showMessageDialog(this, "Error finding product in cart", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }

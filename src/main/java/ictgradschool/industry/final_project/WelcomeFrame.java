@@ -1,10 +1,12 @@
 package ictgradschool.industry.final_project;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 
 public class WelcomeFrame extends JFrame {
     private CardLayout cardLayout;
@@ -56,7 +58,36 @@ public class WelcomeFrame extends JFrame {
         fileChooser = new JFileChooser();
         fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 
-        JButton openButton = new JButton("Open/Create Filestore");
+        JButton openButton = new JButton("Open an existing Filestore");
+        JButton newFileButton = new JButton("Create a new file to continue.");
+        newFileButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                fileChooser.setDialogTitle("Specify a file to continue");
+                fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                fileChooser.setAcceptAllFileFilterUsed(false);
+                fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("TXT Files", "txt"));
+                int userSelection = fileChooser.showSaveDialog(WelcomeFrame.this);
+
+                if(userSelection == JFileChooser.APPROVE_OPTION){
+                    File fileToSave = fileChooser.getSelectedFile();
+                    if(!fileToSave.getAbsolutePath().endsWith(".txt")) {
+                        fileToSave = new File(fileToSave.getAbsolutePath() + ".txt");
+                    }
+                    try {
+                        if(fileToSave.createNewFile()){
+                            filePath = fileToSave.getAbsolutePath();
+                            JOptionPane.showMessageDialog(WelcomeFrame.this, "File created: "+ fileToSave.getAbsolutePath());
+                            cardLayout.show(mainPanel, "Options");
+                        } else {
+                            JOptionPane.showMessageDialog(WelcomeFrame.this, "File already exists.", "File Exists.", JOptionPane.ERROR_MESSAGE);
+                        }
+                    } catch (IOException ex){
+                        JOptionPane.showMessageDialog(WelcomeFrame.this, "An error occurred while creating the file.", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            }
+        });
         openButton.addActionListener(new ActionListener() {
             // actionListener is an interface, to implement it, you must override the method "actionPerformed".
             @Override
@@ -76,6 +107,7 @@ public class WelcomeFrame extends JFrame {
         });
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(openButton);
+        buttonPanel.add(newFileButton);
         fileChooserPanel.add(buttonPanel, BorderLayout.SOUTH);
     }
     private void initializeOptionsPanel(){

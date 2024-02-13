@@ -14,9 +14,10 @@ public class InventoryManagerFrame extends JFrame {
     private JTextField identifierField, nameField, descriptionField, priceField, stockQuantityField;
     private JButton addButton, removeButton, goBackButton;
     private WelcomeFrame welcomeFrame;
-    private JComboBox<String> filterComboBox;
+    private JComboBox<String> stockFilterComboBox;
     private JTextField searchField;
     private JButton searchButton;
+    private JButton clearSearchButton;
     public InventoryManagerFrame() {
         setTitle("Inventory Manager");
         setSize(800, 600);
@@ -64,12 +65,31 @@ public class InventoryManagerFrame extends JFrame {
         // Panel for Search components
         JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 5));
         JLabel searchLabel = new JLabel("Search:");
-        JTextField searchField = new JTextField(20);
-        JButton searchButton = new JButton("Search");
+        searchField = new JTextField(20);
+        searchButton = new JButton("Search");
+        clearSearchButton = new JButton("Clear Search");
+        clearSearchButton.addActionListener(e -> clearSearch());
+        stockFilterComboBox = new JComboBox<>(new String[]{"Show All", "In-Stock", "Out-of-Stock"});
+        stockFilterComboBox.addActionListener(e -> {
+            String filterType = (String) stockFilterComboBox.getSelectedItem();
+            switch (filterType){
+                case "In-Stock":
+                    applyStockFilter("In-Stock");
+                    break;
+                case "Out-of-Stock":
+                    applyStockFilter("Out-of-Stock");
+                    break;
+                default:
+                    clearSearch();
+                    break;
+            }
+        });
 
         searchPanel.add(searchLabel);
         searchPanel.add(searchField);
         searchPanel.add(searchButton);
+        searchPanel.add(clearSearchButton);
+        searchPanel.add(stockFilterComboBox);
 
         searchButton.addActionListener(e -> applySearchFilter(searchField.getText()));
 
@@ -186,22 +206,6 @@ public class InventoryManagerFrame extends JFrame {
         fileHandler.writeProductsToFile(filePath, products);
     }
 
-
-    private java.util.List<Product> getAllProductsFromTable() {
-        java.util.List<Product> products = new ArrayList<>();
-        for (int i = 0; i < tableModel.getRowCount(); i++) {
-            // Extract data for each row and create a Product object
-            // Add it to the list
-            String identifier = (String) tableModel.getValueAt(i, 0); // Identifier
-            String name = (String) tableModel.getValueAt(i, 1); // Name
-            String description = (String) tableModel.getValueAt(i, 2); // Description
-            double price = (Double) tableModel.getValueAt(i, 3); // Price
-            int stockQuantity = (Integer) tableModel.getValueAt(i, 4); // Stock Quantity
-            products.add(new Product(identifier, name, description, price, stockQuantity));
-
-        }
-        return products;
-    }
     private void initializeTable(){
         String[] columnNames = {"Identifier", "Name", "Description", "Price", "Stock Quantity"};
         tableModel = new DefaultTableModel(columnNames, 0) {
@@ -217,6 +221,9 @@ public class InventoryManagerFrame extends JFrame {
                 }
             }
         };
+        tableModel.addTableModelListener(e -> {
+            saveProductsToFile();
+        });
         productTable = new JTable(tableModel);
         JScrollPane scrollPane = new JScrollPane(productTable);
         mainPanel.add(scrollPane, BorderLayout.CENTER);
